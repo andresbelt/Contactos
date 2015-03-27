@@ -60,7 +60,6 @@ public class AndroidUtils {
     }
 
 
-
     public static File generatePicture() {
         try {
             File storageDir = getAlbumDir();
