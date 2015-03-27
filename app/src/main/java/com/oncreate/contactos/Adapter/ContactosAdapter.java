@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,7 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-import com.squareup.picasso.Callback;
+import com.oncreate.contactos.Database.Contactos;
+import com.oncreate.contactos.R;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;

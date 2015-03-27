@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.ui;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,13 +10,29 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.oncreate.contactos.util.AndroidUtils;
+import com.oncreate.contactos.AplicationLoader;
+import com.oncreate.contactos.Database.Contactos;
+import com.oncreate.contactos.Database.ContactosDbHelper;
+import com.oncreate.contactos.R;
+import com.oncreate.contactos.util.Singleton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +47,7 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
     //
     private int modo;
 
-
+private double latitud,longitud;
     public static String currentPicturePath;
 
     //
@@ -43,9 +59,10 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
     //
     // Elementos de la vista
     //
+    private static ImageView imagen;
     private EditText nombre;
     private EditText telefono;
-
+    private  GoogleMap map;
     private Button boton_guardar;
     private Button boton_cancelar;
     private Button boton_image;
@@ -65,12 +82,17 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
         boton_guardar = (Button) findViewById(R.id.boton_guardar);
         boton_cancelar = (Button) findViewById(R.id.boton_cancelar);
         boton_image = (Button) findViewById(R.id.addImagen);
-
+        imagen = (ImageView) findViewById(R.id.imageView);
         if (extra.containsKey(ContactosDbHelper.C_COLUMNA_ID)) {
             id = extra.getLong(ContactosDbHelper.C_COLUMNA_ID);
             consultar(id);
         }
 
+
+        map  = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
+                .getMap();
+
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         establecerModo(extra.getInt(MainActivity.C_MODO));
 
@@ -79,6 +101,7 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
 
         boton_cancelar.setOnClickListener(this);
         boton_image.setOnClickListener(this);
+        fillMap();
 
     }
 
@@ -86,14 +109,42 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
         this.modo = m;
 
         if (modo == MainActivity.VISUALIZAR) {
-            this.setTitle(nombre.getText().toString());
-            this.setEdicion(false);
+            setTitle(nombre.getText().toString());
+           setEdicion(false);
+            mapa(false);
         } else if (modo == MainActivity.CREAR) {
-            this.setTitle(R.string.Contacto_crear_titulo);
-            this.setEdicion(true);
+            setTitle(R.string.Contacto_crear_titulo);
+           setEdicion(true);
+            mapa(true);
         } else if (modo == MainActivity.EDITAR) {
-            this.setTitle(R.string.Contacto_editar_titulo);
-            this.setEdicion(true);
+           setTitle(R.string.Contacto_editar_titulo);
+           setEdicion(true);
+            mapa(false);
+        }
+    }
+
+
+    private void fillMap() {
+        if (map != null) {
+
+            try {
+
+                double Latitud = this.latitud;
+                double Longitud = this.longitud;
+
+                LatLng latLng = new LatLng(Latitud, Longitud);
+                MarkerOptions mk = new MarkerOptions()
+                        // .icon(BitmapDescriptorFactory.fromBitmap(atmPic))
+                        .draggable(false).position(latLng);
+                map.addMarker(mk);
+                LatLng currentLoc = new LatLng(Latitud, Longitud);
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLoc,
+                        16));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -107,6 +158,45 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
         telefono.setText(contacto.getTelefono());
 
     }
+
+    private void mapa(boolean o){
+
+   if(o){
+
+       latitud = Singleton.getInstance().getLatitud();
+       longitud = Singleton.getInstance().getLongitud();
+        map.getUiSettings().setZoomControlsEnabled(true);
+        map.getUiSettings().setCompassEnabled(true);
+
+       map.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+
+           @Override
+           public void onMarkerDragStart(Marker marker) {
+           }
+
+           @Override
+           public void onMarkerDragEnd(Marker marker) {
+               Log.d("error", "latitude : "+ marker.getPosition().latitude);
+               marker.setSnippet(String.valueOf(marker.getPosition().latitude));
+               map.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+           }
+
+           @Override
+           public void onMarkerDrag(Marker marker) {
+           }
+
+       });}
+   else{
+
+       latitud = Double.parseDouble(contacto.getLatitud());
+       longitud =  Double.parseDouble(contacto.getLongitud());
+       map.getUiSettings().setAllGesturesEnabled(false);
+
+
+   }
+    }
+
 
     private void setEdicion(boolean opcion) {
         nombre.setEnabled(opcion);
@@ -135,7 +225,7 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
             getMenuInflater().inflate(R.menu.menu_detalle, menu);
 
         else
-            getMenuInflater().inflate(R.menu.menu_detalle, menu);
+            getMenuInflater().inflate(R.menu.menu_crear, menu);
 
         return true;
     }
@@ -260,10 +350,9 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
             }
             activity.startActivityForResult(takePictureIntent, 13);
         } catch (Exception e) {
-
+            //	FileLog.e("tmessages", e);
         }
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -313,38 +402,61 @@ public class DetalleActivity extends ActionBarActivity implements View.OnClickLi
 
         FileOutputStream stream = new FileOutputStream(file);
         myBitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
-
         if (file != null) {
 
             Ruta = file.getAbsolutePath();
+            imagen.setImageBitmap(myBitmap);
         }
     }
 
 
+
     private void guardar() {
 
+        String mNombre = nombre.getText().toString();
+       String mTelefono = telefono.getText().toString();
 
+        boolean cancel = false;
+        View focusView = null;
 
-
-
-
-        contacto.setNombre(nombre.getText().toString());
-        contacto.setTelefono(telefono.getText().toString());
-        contacto.setFoto(Ruta);
-        contacto.setLatitud("0.0");
-        contacto.setLongitud("0.0");
-
-
-        contacto.save();
-
-        if (modo == MainActivity.CREAR) {
-            // Toast.makeText(this, R.string.hipoteca_crear_confirmacion, Toast.LENGTH_SHORT).show();
-        } else if (modo == MainActivity.EDITAR) {
-            // Toast.makeText(this, R.string.hipoteca_editar_confirmacion, Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(mNombre)) {
+            nombre.setError(this.getResources().getString(R.string.nombre_requerido));
+            focusView = nombre;
+            cancel = true;
         }
 
-        setResult(RESULT_OK);
-        finish();
+        if (TextUtils.isEmpty(mTelefono)) {
+            telefono.setError(this.getResources().getString(R.string.tel_requerido));
+            focusView = nombre;
+            cancel = true;
+        }
+
+
+        if (TextUtils.isEmpty(Ruta)) {
+           Toast.makeText(this, this.getResources().getString(R.string.imagen_requerida),Toast.LENGTH_LONG).show();
+            cancel = true;
+        }
+
+        if (cancel) {
+            if(focusView != null)
+            focusView.requestFocus();
+        } else {
+            contacto.setNombre(mNombre);
+            contacto.setTelefono(mTelefono);
+            contacto.setFoto(Ruta);
+            contacto.setLatitud(String.valueOf(latitud));
+            contacto.setLongitud(String.valueOf(longitud));
+            contacto.save();
+
+            if (modo == MainActivity.CREAR) {
+                // Toast.makeText(this, R.string.hipoteca_crear_confirmacion, Toast.LENGTH_SHORT).show();
+            } else if (modo == MainActivity.EDITAR) {
+                // Toast.makeText(this, R.string.hipoteca_editar_confirmacion, Toast.LENGTH_SHORT).show();
+            }
+
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     private void cancelar() {

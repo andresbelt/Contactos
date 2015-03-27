@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;

@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.Database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

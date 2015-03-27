@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.Database;
 
 
 import android.content.ContentValues;
@@ -139,8 +139,6 @@ public class Contactos {
     public long save()
     {
         ContactosDbHelper dbAdapter = new ContactosDbHelper(this.getContext());
-
-        // comprobamos si estamos insertando o actualizando según esté o no relleno el identificador
         if ((this.getId() == null) || (!dbAdapter.exists(this.getId())))
         {
             long nuevoId = dbAdapter.insert(this.toContentValues());
@@ -160,7 +158,6 @@ public class Contactos {
 
     public long delete()
     {
-        // borramos el registro
         ContactosDbHelper dbAdapter = new ContactosDbHelper(this.getContext());
 
         return dbAdapter.delete(this.getId());

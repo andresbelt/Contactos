@@ -1,10 +1,7 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.util;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ContentUris;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -18,9 +15,10 @@ import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.oncreate.contactos.AplicationLoader;
+
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

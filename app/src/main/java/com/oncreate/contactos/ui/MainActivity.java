@@ -1,4 +1,4 @@
-package com.oncreate.contactos;
+package com.oncreate.contactos.ui;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -14,6 +14,10 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.oncreate.contactos.Adapter.ContactosAdapter;
+import com.oncreate.contactos.Database.ContactosDbHelper;
+import com.oncreate.contactos.R;
 
 
 public class MainActivity extends ActionBarActivity implements AdapterView.OnItemClickListener, View.OnCreateContextMenuListener {
