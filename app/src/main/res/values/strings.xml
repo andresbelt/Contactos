@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Contactos</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_detalle">DetalleActivity</string>
+    <string name="title_activity_add">AddActivity</string>
+    <string name="boton_cancelar">Cancelar</string>
+    <string name="boton_guardar">Guardar</string>
+    <string name="Contacto_crear_titulo">Nuevo Contacto</string>
+    <string name="Contacto_editar_titulo">Editar contacto</string>
+    <string name="contacto_eliminar_titulo">Eliminar contacto</string>
+    <string name="contacto_eliminar_mensaje">Esta seguro que desea eliminar el contacto?</string>
+    <string name="contacto_eliminar_confirmacion">Contacto eliminado</string>
+    <string name="menu_eliminar">Eliminar</string>
+    <string name="menu_editar">Editar</string>
+    <string name="menu_guardar">Guardar</string>
+    <string name="menu_cancelar">Cancelar</string>
+    <string name="menu_visualizar">Ver</string>
+    <string name="seleccion_fotos">Seleccione la foto</string>
+    <string name="seleccion_camara">Camara</string>
+    <string name="seleccion_galeria">Galeria</string>
+</resources>
